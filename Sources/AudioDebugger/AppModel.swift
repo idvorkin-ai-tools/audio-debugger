@@ -159,7 +159,7 @@ final class AppModel {
 
     /// Open the wanted mic, else the next best that has not failed this round; `mic` is only ever an open one.
     /// `done` says whether one opened, unless a newer open superseded this one.
-    private func openBest(wanted: String?, done: @escaping (Bool) -> Void = { _ in }) {
+    private func openBest(wanted: String?, done: @escaping (Bool) -> Void) {
         guard let pick = Mics.choose(from: mics.filter { !failed.contains($0.uid) }, wanted: wanted) else {
             openGeneration += 1  // an open still in flight is closed by this stop, so its result must not count
             opening = nil

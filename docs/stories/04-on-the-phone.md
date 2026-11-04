@@ -34,7 +34,8 @@ gain or voice processing.
 
 **Summary**: The audio session's inputs are the mic list: a USB mic, else a wired headset's, else the built-in one;
 Bluetooth last, since opening AirPods' mic drops them to call quality.
-**Status**: Planned
+**Status**: In progress. The Bluetooth scenario's fix is on the mic-open-off-main branch (ad-pdv; just test, Mac
+selftest, iOS simulator selftest); its phone rung is pending Igor's next drive. The other two scenarios: Planned.
 
 **Use Case**: As Igor, I want the phone to open the right mic by itself, so that my AirPods keep playing music in
 full quality while the phone's mic is measured.
@@ -56,7 +57,7 @@ full quality while the phone's mic is measured.
 
 **Notes**: Opening a mic runs off the main thread (ad-pdv): the car's mic took 1.8 s to open, which MetricKit
 reported as a hang on 12d285f. The fix's commit (mic-open-off-main branch) logs each open's `ms`: the Mac's built-in
-mic takes 1.3 s too (selftest). The Bluetooth scenario's phone rung is Igor's next drive.
+mic takes 1.3 s too (selftest).
 
 ## 011 — The replay keeps listening in the background
 

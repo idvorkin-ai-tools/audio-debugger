@@ -41,7 +41,6 @@ final class Capture: @unchecked Sendable {
 
     private func open(uid: String) throws -> Double {
         close()
-        current += 1
         let token = current
         let source = try MicSource(
             uid: uid, deliver: { [weak self] samples in self?.ingest(samples) },
