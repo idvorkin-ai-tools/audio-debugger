@@ -57,7 +57,8 @@ full quality while the phone's mic is measured.
 
 **Notes**: Opening a mic runs off the main thread (ad-pdv): the car's mic took 1.8 s to open, which MetricKit
 reported as a hang on 12d285f. The fix's commit (mic-open-off-main branch) logs each open's `ms`: the Mac's built-in
-mic takes 1.3 s too (selftest).
+mic takes 1.3 s too (selftest). Without the mic permission a device change only refreshes the list and opens nothing,
+so "Microphone access denied" stays up (host harness with a fake mic; not yet run on selftest, simulator or phone).
 
 ## 011 — The replay keeps listening in the background
 

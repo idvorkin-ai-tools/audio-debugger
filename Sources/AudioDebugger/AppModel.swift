@@ -142,6 +142,8 @@ final class AppModel {
         failed = []  // a device change is a new chance for every mic
         Log.mic.info("mics: \(self.mics.map(\.name).joined(separator: ", "), privacy: .public)")
         SessionLog.shared.event("mics", ["names": mics.map(\.name)])
+        // Without the permission every mic fails, and those errors and retries would hide "Microphone access denied".
+        guard AVCaptureDevice.authorizationStatus(for: .audio) == .authorized else { return }
         let named = Launch.micName.flatMap { n in mics.first { $0.name.localizedCaseInsensitiveContains(n) }?.uid }
         let wanted = named ?? UserDefaults.standard.string(forKey: Key.mic)
         // The mic being opened counts as the current one: reopening it would only add another wait and gap.
@@ -150,10 +152,9 @@ final class AppModel {
         {
             return
         }
-        // Retries too: this chain may supersede captureFailed's, whose retry would then never run. Not without the
-        // permission, where every mic fails and the retries would hide "Microphone access denied".
+        // Retries too: this chain may supersede captureFailed's, whose retry would then never run.
         openBest(wanted: wanted) { [weak self] ok in
-            if !ok, AVCaptureDevice.authorizationStatus(for: .audio) == .authorized { self?.retry(after: 3) }
+            if !ok { self?.retry(after: 3) }
         }
     }
 
