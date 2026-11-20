@@ -4,6 +4,10 @@ installed := "/Applications/" + file_name(app)
 # in three ("plugin for module 'TestingMacros' not found"). Loading the library in-process never has.
 testing_macros := "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing/libTestingMacros.dylib"
 
+# Shared entry points across Igor's native repos: just build, test, install, run.
+alias build := app
+alias install := live-install
+
 default:
     @just --list
 
