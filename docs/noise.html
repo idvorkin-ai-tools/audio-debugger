@@ -235,10 +235,10 @@
       <tr><td class="num">6 to 15 dB</td><td class="poor">POOR</td><td>Listening is tiring and recognition errors are frequent. Fix the mic position or the room.</td></tr>
       <tr><td class="num">under 6 dB</td><td>no speech heard</td><td>The loud frames are barely above the quiet ones: either nobody is talking, or the noise is as loud as the voice. The meter cannot tell which; replay and listen.</td></tr>
     </table></div>
-    <p class="note">These bands are a rule of thumb, tuned for this percentile measure. As a rough anchor, recognizer
-    accuracy tends to hold up above about 20&nbsp;dB of conventional SNR and fall off steeply toward 0 to 5&nbsp;dB,
-    where noisy-speech benchmarks do most of their testing; the exact numbers vary a lot by model and by kind of noise
-    (babble is far worse than fan noise at the same level).</p>
+    <p class="note">These bands are the app's rule of thumb for this percentile measure, not a published standard.
+    How much noise a recognizer tolerates varies too much by model and by kind of noise to quote one number: other
+    people talking hurts far more than a fan at the same level. Recognizers get worse as separation shrinks, so the
+    useful habit is comparing: the same sentence, two mics or two positions, and keep the bigger number.</p>
 
     <h3>What noise reduction trades away</h3>
     <p>The replay's noise reduction (N) learns the noise from the quietest fifth of the clip and turns down each
@@ -363,13 +363,18 @@
     through a USB mic arrive whole.</p>
 
     <h3>The iPhone with AirPods</h3>
-    <p>On the iPhone the path is: AirPods mics and their own beamforming and noise suppression, then the HFP codec,
-    then iOS's audio session, then the app. Audio Debugger asks iOS for <code>.measurement</code> mode, which turns
-    off the system's own voice processing and automatic gain, so what the app shows is what arrived over Bluetooth.
-    It cannot switch off the processing inside the AirPods, which happens before the radio. Comparing AirPods with
-    the iPhone's built-in mic on the same sentence, in replay, shows what that path costs: look for the missing
-    top of the spectrogram and the softened word starts. The <a href="https://idvorkin-ai-tools.github.io/airpods-mic-explainer/">AirPods
-    case study</a> covers the Mac side of the same problem.</p>
+    <p>On the iPhone the path is: the AirPods' mics, their own beamforming and noise suppression, a call-mode voice
+    codec over Bluetooth, iOS's audio session, then the app. Which codec depends on the model: developers have
+    reported recent AirPods using Apple's AAC-ELD at 24&nbsp;kHz for calls, where older ones use HFP's mSBC or
+    CVSD, and Apple does not document it. Whatever the codec, opening the mic puts the AirPods in call mode, and
+    the iPhone's audio session typically drops to 16&nbsp;kHz while it lasts.</p>
+    <p>Audio Debugger lists AirPods' mic last and never opens it by itself, so your music keeps playing in full
+    quality. It asks iOS for <code>.measurement</code> mode, which turns off the system's own voice processing and
+    automatic gain, so what the app shows is what arrived over Bluetooth. It cannot switch off the processing inside
+    the AirPods, which happens before the radio. To see what that path costs, record the same sentence on the
+    iPhone's built-in mic and on the AirPods and compare them in replay: look for an empty top of the spectrogram
+    and softened word starts. The <a href="https://idvorkin-ai-tools.github.io/airpods-mic-explainer/">AirPods
+    case study</a> shows the result on a Mac, with real recordings.</p>
   </div>
 </section>
 

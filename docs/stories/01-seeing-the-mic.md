@@ -34,7 +34,8 @@ Bluetooth mics carry a tooltip saying so. Core Audio's private `CADefaultDeviceA
 frequency, pitch as a note, clip count, a gain hint, and a noise readout: floor, speech level and their separation
 with a good / ok / poor band, H for what they mean.
 **Status**: Done (06c69ad; host tests for levels, noise floor, spectrum calibration, pitch, spectrogram; selftest log).
-Noise readout and H: in progress on feat/noise-readout (host tests on Linux; selftest and run owed on a Mac)
+Noise readout and H: in progress (9680129; host tests run on Linux, the Mac app cross-compiled, iOS type-checked;
+just test, selftest and run owed on a Mac)
 
 **Use Case**: As Igor, I want to see my mic's level, noise and tone at a glance, so that I can set the gain and
 spot hum or hiss.
