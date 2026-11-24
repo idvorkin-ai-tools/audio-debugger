@@ -35,7 +35,8 @@ frequency, pitch as a note, clip count, a gain hint, and a noise readout: floor,
 with a good / ok / poor band, H for what they mean.
 **Status**: Done (06c69ad; host tests for levels, noise floor, spectrum calibration, pitch, spectrogram; selftest log).
 Noise readout and H: in progress (9680129; host tests run on Linux, the Mac app cross-compiled, iOS type-checked;
-just test, selftest and run owed on a Mac)
+on the Mac, 2026-11-24: just test, lint, and the selftest on the OBSBOT mic logged the readout, floor -70, speech
+-67, "no speech heard" in a quiet room; the band moving as someone talks and stops, and H opening, owed to a run)
 
 **Use Case**: As Igor, I want to see my mic's level, noise and tone at a glance, so that I can set the gain and
 spot hum or hiss.

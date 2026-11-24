@@ -91,4 +91,7 @@ private func sampleSidecar(_ x: [Float], rate: Double, mic: String, commit: Stri
     return d
 }
 
-private func tenths(_ db: Float) -> Double { (Double(db) * 10).rounded() / 10 }
+/// A Decimal, not a Double: JSONSerialization writes the Double -69.4 as -69.400000000000006 (seen on the Mac).
+private func tenths(_ db: Float) -> NSDecimalNumber {
+    NSDecimalNumber(decimal: Decimal(Int((Double(db) * 10).rounded())) / 10)
+}

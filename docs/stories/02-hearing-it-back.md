@@ -77,8 +77,9 @@ replay, off the main thread. Without either, the clip is normalized to -1 dBFS p
 **Summary**: S saves the last 20 s the mic heard, raw, as a WAV with a JSON sidecar of what was measured: noise
 floor, median, speech level, separation and its band, peak, clipped samples, mic, rate, commit.
 **Status**: In progress (9680129; the sidecar's maths: host tests on Linux, and run over a 60 s 16 kHz
-recording: floor -61.7, speech -16.2, separation 45.5 dB GOOD; the app layer cross-compiled for macOS; selftest and
-run owed on a Mac)
+recording: floor -61.7, speech -16.2, separation 45.5 dB GOOD; the app layer cross-compiled for macOS. On the Mac,
+2026-11-24, the selftest saved `sample.wav` (48 kHz mono float32) and `sample.json` with numbers in tenths; S
+revealing the WAV in Finder owed to a run)
 **Why**: "So I could take my live samples and maybe save them": a room or a mic, kept to compare later.
 
 **Use Case**: As Igor, I want to keep the last 20 seconds with its numbers, so that I can compare mics and rooms
