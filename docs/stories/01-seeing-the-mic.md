@@ -30,9 +30,11 @@ Bluetooth mics carry a tooltip saying so. Core Audio's private `CADefaultDeviceA
 
 ## 002 — Live readings
 
-**Summary**: Waveform, log-frequency spectrum with peak hold, 0–8 kHz spectrogram, RMS/peak meter, noise floor,
-dominant frequency, pitch as a note, clip count, and a gain hint.
-**Status**: Done (06c69ad; host tests for levels, noise floor, spectrum calibration, pitch, spectrogram; selftest log)
+**Summary**: Waveform, log-frequency spectrum with peak hold, 0–8 kHz spectrogram, RMS/peak meter, dominant
+frequency, pitch as a note, clip count, a gain hint, and a noise readout: floor, speech level and their separation
+with a good / ok / poor band, H for what they mean.
+**Status**: Done (06c69ad; host tests for levels, noise floor, spectrum calibration, pitch, spectrogram; selftest log).
+Noise readout and H: in progress on feat/noise-readout (host tests on Linux; selftest and run owed on a Mac)
 
 **Use Case**: As Igor, I want to see my mic's level, noise and tone at a glance, so that I can set the gain and
 spot hum or hiss.
@@ -52,6 +54,23 @@ spot hum or hiss.
   - When I look at the status line
   - Then pitch reads A2
 
+- Scenario: How much background noise is there
+  - Given I talked for the last 20 s over a room whose gaps read -62 dBFS and my voice's loud frames -17 dBFS
+  - When I look at the noise readout
+  - Then it says noise floor -62 dB, speech -17 dB, speech − floor 45 dB GOOD
+- Scenario: Nobody is talking
+  - Given the last 20 s were a steady room and no speech
+  - When I look at the noise readout
+  - Then the separation says "no speech heard", not POOR
+- Scenario: What do these mean
+  - Given the noise readout is on screen
+  - When I press H
+  - Then the noise explainer (docs/noise.html, bundled in the Mac app) opens in the browser
+
 **Notes**: Spectrum is amplitude dBFS (a full-scale sine reads 0 dB). Pitch: FFT autocorrelation, the strongest local
-maximum over 60–1000 Hz, gate -60 dBFS. Noise floor: the 10th percentile of the
-last 5 s of RMS readings, digital silence ignored (a running minimum latched onto start-up buffers at -110 dB).
+maximum over 60–1000 Hz, gate -60 dBFS. Noise readout (`AudioCore/NoiseMetrics.swift`): the last 20 s of RMS
+readings (the replay's span, 600 at 30 Hz), digital silence ignored; floor = 10th percentile, speech = 95th,
+separation = speech − floor, banded GOOD ≥ 30 dB, OK ≥ 15, POOR ≥ 6, under 6 "no speech heard" (a rule of thumb,
+explained in docs/noise.html). The floor's window was 5 s until the readout (a running minimum before that latched
+onto start-up buffers at -110 dB). Noise readout: host tests for the percentiles and bands, Linux-run; the app layer
+cross-compiled for macOS and type-checked for iOS from Linux; selftest and a live run still owed on a Mac.
