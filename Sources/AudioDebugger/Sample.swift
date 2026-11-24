@@ -75,7 +75,7 @@ extension AppModel {
 /// A saved sample's sidecar: numbers stay numbers, so `jq` compares them.
 private func sampleSidecar(_ x: [Float], rate: Double, mic: String, commit: String) -> [String: Any] {
     var d: [String: Any] = [
-        "mic": mic, "sample_rate": rate, "seconds": Double(x.count) / rate, "commit": commit,
+        "mic": mic, "sample_rate": rate, "seconds": jsonNumber(Double(x.count) / rate, places: 2), "commit": commit,
         "saved_at": ISO8601DateFormatter().string(from: Date()), "audio": "raw (no noise reduction or boost)",
         "peak_db": tenths(decibels(peak(x[...]))), "clipped_samples": clippedSamples(x),
         "method":
@@ -91,7 +91,4 @@ private func sampleSidecar(_ x: [Float], rate: Double, mic: String, commit: Stri
     return d
 }
 
-/// A Decimal, not a Double: JSONSerialization writes the Double -69.4 as -69.400000000000006 (seen on the Mac).
-private func tenths(_ db: Float) -> NSDecimalNumber {
-    NSDecimalNumber(decimal: Decimal(Int((Double(db) * 10).rounded())) / 10)
-}
+private func tenths(_ db: Float) -> NSDecimalNumber { jsonNumber(Double(db), places: 1) }

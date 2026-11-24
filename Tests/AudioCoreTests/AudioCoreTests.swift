@@ -89,6 +89,19 @@ private func noise(_ count: Int, amplitude: Float, seed: UInt64 = 1) -> [Float] 
     #expect(clippedSamples([0.5, 1, -1, 0.9991, 0.998]) == 3)
 }
 
+// The sidecar's numbers as JSON prints them: an AirPods clip of 430,560 samples at 24 kHz is 17.94 s, which a
+// Double writes as 17.940000000000001 (seen on the Mac, 2026-11-24).
+@Test func sidecarNumbersPrintShort() throws {
+    func json(_ value: Double, _ places: Int) throws -> String {
+        let data = try JSONSerialization.data(withJSONObject: ["v": jsonNumber(value, places: places)])
+        return String(decoding: data, as: UTF8.self)
+    }
+    #expect(try json(430_560 / 24_000, 2) == #"{"v":17.94}"#)
+    #expect(try json(Double(Float(-69.4)), 1) == #"{"v":-69.4}"#)
+    #expect(try json(20, 2) == #"{"v":20}"#)
+    #expect(try json(-0.04, 1) == #"{"v":0}"#)
+}
+
 @Test func noteNames() {
     #expect(noteName(440) == "A4 +0¢")
     #expect(noteName(261.63) == "C4 +0¢")

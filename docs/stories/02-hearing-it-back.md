@@ -78,8 +78,10 @@ replay, off the main thread. Without either, the clip is normalized to -1 dBFS p
 floor, median, speech level, separation and its band, peak, clipped samples, mic, rate, commit.
 **Status**: In progress (9680129; the sidecar's maths: host tests on Linux, and run over a 60 s 16 kHz
 recording: floor -61.7, speech -16.2, separation 45.5 dB GOOD; the app layer cross-compiled for macOS. On the Mac,
-2026-11-24, the selftest saved `sample.wav` (48 kHz mono float32) and `sample.json` with numbers in tenths; S
-revealing the WAV in Finder owed to a run)
+2026-11-24, the selftest saved `sample.wav` (48 kHz mono float32) and `sample.json` with numbers in tenths. Later
+that day the selftest on AirPods (24 kHz) wrote `"seconds" : 17.940000000000001` for a clip under 20 s; seconds now
+print in hundredths (host test `sidecarNumbersPrintShort`, then the selftest on AirPods wrote `13.94`). S revealing
+the WAV in Finder owed to a run)
 **Why**: "So I could take my live samples and maybe save them": a room or a mic, kept to compare later.
 
 **Use Case**: As Igor, I want to keep the last 20 seconds with its numbers, so that I can compare mics and rooms
@@ -97,6 +99,7 @@ later, or hand the clip to another tool.
   - When I read `sample.json`
   - Then its floor, speech and separation are those of the raw WAV beside it, in 50 ms frames, not the live readout
     and not the replay's processed audio
+  - And decibels read in tenths and the length in hundredths of a second (`-69.4`, `17.94`), never 17 digits
 - Scenario: Never filed as a bug
   - Given the bug-kit listener reads the app's folder
   - When I save a sample
