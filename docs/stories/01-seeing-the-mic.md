@@ -74,5 +74,4 @@ maximum over 60–1000 Hz, gate -60 dBFS. Noise readout (`AudioCore/NoiseMetrics
 readings (the replay's span, 600 at 30 Hz), digital silence ignored; floor = 10th percentile, speech = 95th,
 separation = speech − floor, banded GOOD ≥ 30 dB, OK ≥ 15, POOR ≥ 6, under 6 "no speech heard" (a rule of thumb,
 explained in docs/noise.html). The floor's window was 5 s until the readout (a running minimum before that latched
-onto start-up buffers at -110 dB). Noise readout: host tests for the percentiles and bands, Linux-run; the app layer
-cross-compiled for macOS and type-checked for iOS from Linux; selftest and a live run still owed on a Mac.
+onto start-up buffers at -110 dB). What has been verified for the noise readout is in the Status line.
