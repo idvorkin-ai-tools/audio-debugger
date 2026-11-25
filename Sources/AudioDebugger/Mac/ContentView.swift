@@ -11,6 +11,7 @@ struct ContentView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             MicBar()
+            InputLine()
             HStack {
                 ForEach([20, 10, 5], id: \.self) { s in
                     Button("▶ Last \(s)s  \(Self.replayKey[s] ?? "")") { model.replay(seconds: s) }

@@ -9,6 +9,9 @@ A native macOS app for finding out how a microphone actually sounds: see the sig
 
 - **Every mic as a button** (keys 1–9). The choice is remembered and comes back when a USB mic is re-plugged; it
   never opens AirPods by accident (that drops them into call-quality mode, music and all).
+- **Input line** under the mic bar: the input in use, the rate it opened at, call mode (HFP) when a headset is in
+  it, and the highest frequency that rate carries (Nyquist), marked on the spectrum; above it, the spectrogram
+  stays black.
 - **Waveform** scaled to its own peak, so a quiet mic still fills it.
 - **Spectrum** (log frequency, dBFS, with a decaying peak line) and a **0–8 kHz spectrogram** for hum, hiss and
   the shape of your voice.

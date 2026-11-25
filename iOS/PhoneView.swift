@@ -24,6 +24,7 @@ struct PhoneView: View {
                     Image(systemName: "ellipsis.circle").font(.title2)
                 }
             }
+            InputLine()
             HStack {
                 ForEach([20, 10, 5], id: \.self) { s in
                     Button("▶ \(s)s") { model.replay(seconds: s) }.buttonStyle(.borderedProminent)
