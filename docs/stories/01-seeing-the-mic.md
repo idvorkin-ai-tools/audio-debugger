@@ -63,7 +63,9 @@ The spectrogram's axis is 0–8 kHz whatever the rate; what a slower input canno
 whether it is a Bluetooth headset in call mode, with the highest frequency that rate can carry (half the rate, the
 Nyquist limit). The spectrum marks that limit at its right edge, and the spectrogram, always 0–8 kHz, stays black
 above it, with a line at the limit.
-**Status**: Planned
+**Status**: Done (013efc2; host tests for the line's text, kHz and the padded spectrogram column at 8, 16 and
+48 kHz; selftest: "Input MacBook Pro Microphone · 48 kHz · up to 24 kHz" logged and on screen with "Nyquist 24k";
+`just ios-build`). Call mode, 8 and 16 kHz routes and the route-change refresh: phone, not yet verified.
 **Issues**: idvorkin/audio-debugger#10
 **Why**: The rate was only in the log. A headset in call mode opens at 16 kHz (nothing above 8 kHz) or 8 kHz
 (nothing above 4 kHz), and on screen that looked like a dull mic rather than a capped one.
