@@ -33,6 +33,10 @@ final class AppModel {
     var mics: [Mic] { micControl.mics }
     var mic: Mic? { micControl.mic }
     var micError: String? { micControl.error }
+    /// The open input, its rate and call mode (story 015); nil while none is open. The rate is the readings' own.
+    private(set) var input: InputFormat?
+    /// The mic and rate `input` was last opened at, so a route change can refresh its name and call mode.
+    private var opened: (mic: Mic, rate: Double)?
 
     // Live readings, refreshed 30 times a second.
     private(set) var waveform: [Float] = []
@@ -106,6 +110,7 @@ final class AppModel {
         guard timer == nil else { return }
         capture.onFailure = { [weak self] in self?.captureFailed() }
         Mics.onChange { [weak self] in self?.micsChanged() }
+        Mics.onRouteChange { [weak self] in self?.refreshInput() }
         AVCaptureDevice.requestAccess(for: .audio) { granted in
             Task { @MainActor [weak self] in
                 Log.mic.info("microphone access: \(granted ? "granted" : "denied", privacy: .public)")
@@ -168,6 +173,7 @@ final class AppModel {
         for effect in effects {
             switch effect {
             case .open(let m, let generation):
+                setOpened(nil)
                 // Off the main thread; the result comes back on the main queue.
                 capture.start(uid: m.uid) { [weak self] result in
                     guard let self else { return }
@@ -180,6 +186,7 @@ final class AppModel {
                 }
             case .stop:
                 capture.stop()
+                setOpened(nil)
             case .scheduleRetry(let seconds):
                 let item = DispatchWorkItem { [weak self] in
                     MainActor.assumeIsolated {
@@ -204,7 +211,9 @@ final class AppModel {
                     "opened \(m.name, privacy: .public) (\(m.uid, privacy: .public)) at \(rate, privacy: .public) Hz in \(ms, privacy: .public) ms"
                 )
                 SessionLog.shared.event("mic_open", ["name": m.name, "uid": m.uid, "rate": rate, "ms": ms])
+                setOpened((m, rate))
             case .didFail(let m, let error, let ms):
+                setOpened(nil)
                 SessionLog.shared.event("mic_error", ["name": m.name, "error": error, "ms": ms])
                 Log.mic.error("could not open \(m.name, privacy: .public): \(error, privacy: .public)")
             case .failedWhileOpening:
@@ -215,6 +224,29 @@ final class AppModel {
                 Log.mic.info("capture failed; reopening the mic")
             }
         }
+    }
+
+    private func setOpened(_ o: (mic: Mic, rate: Double)?) {
+        opened = o
+        refreshInput()
+    }
+
+    /// The line under the mic bar from the open mic and the route as it stands; logged when its text changes.
+    private func refreshInput() {
+        let next = opened.map { o in
+            let route = Mics.input(for: o.mic)
+            return InputFormat(name: route.name, rate: o.rate, callMode: route.callMode)
+        }
+        guard next != input else { return }
+        input = next
+        let text = next?.text ?? InputFormat.noneText
+        SessionLog.shared.event(
+            "input_format",
+            [
+                "text": text, "name": next?.name as Any, "rate": next?.rate as Any,
+                "call_mode": next?.callMode as Any,
+            ])
+        Log.mic.info("\(text, privacy: .public)")
     }
 
     func resetReadings() {
@@ -253,7 +285,7 @@ final class AppModel {
         pitchHz = pitch.pitch(window)
 
         let binHz = Float(analyzer.sampleRate) / Float(scopeSize)
-        gram.push(Array(db.prefix(min(db.count, Int(8000 / binHz)))))
+        gram.push(spectrogramColumn(db, binHz: binHz))  // 0–8 kHz whatever the rate: black above Nyquist
         spectrogram = makeImage(gram)
 
         let t = player.transport

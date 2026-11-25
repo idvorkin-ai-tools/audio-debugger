@@ -29,6 +29,14 @@ enum Mics {
         }
     }
 
+    /// The input the open `mic` really is, for the line under the mic bar (story 015). On the Mac it is the device
+    /// itself; opening a Bluetooth headset's mic is what puts it into call (hands-free) mode.
+    static func input(for mic: Mic) -> (name: String, callMode: Bool) { (mic.name, mic.isBluetooth) }
+
+    /// The Mac has no audio-session route to follow: a device that changes reopens through `onChange` or a capture
+    /// error, which brings its new rate with it.
+    static func onRouteChange(_ handler: @escaping () -> Void) {}
+
     private static func kind(_ transport: UInt32) -> Mic.Kind {
         switch transport {
         case kAudioDeviceTransportTypeBuiltIn: .builtIn
