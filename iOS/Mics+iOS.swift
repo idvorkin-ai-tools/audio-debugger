@@ -55,6 +55,23 @@ enum Mics {
         }
     }
 
+    /// Calls `handler` on the main queue on every route change, whatever the reason, for the line under the mic bar
+    /// (story 015). It only reads the route: reopening is `onChange`'s.
+    static func onRouteChange(_ handler: @escaping () -> Void) {
+        NotificationCenter.default.addObserver(
+            forName: AVAudioSession.routeChangeNotification, object: nil, queue: .main
+        ) { _ in handler() }
+    }
+
+    /// The input the route really uses (it can differ from the port asked for), and whether it is a Bluetooth
+    /// headset in call (hands-free) mode, for the line under the mic bar (story 015).
+    static func input(for mic: Mic) -> (name: String, callMode: Bool) {
+        guard let port = AVAudioSession.sharedInstance().currentRoute.inputs.first else {
+            return (mic.name, mic.isBluetooth)
+        }
+        return (port.portName, port.portType == .bluetoothHFP)
+    }
+
     /// The session's route as it stands, for the log (ad-944): inputs and outputs as "name (port type)", the
     /// session's rate (16 kHz while a Bluetooth headset or car is in call mode), the input we asked for, the
     /// category, mode and options (A2DP output needs `.allowBluetoothA2DP` still set), and whether other audio plays

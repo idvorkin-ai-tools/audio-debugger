@@ -230,6 +230,17 @@ struct SpectrumView: View {
                 }
                 ctx.stroke(p, with: .color(amber.opacity(0.7)), style: StrokeStyle(lineWidth: 1, dash: [2, 2]))
             }
+            // Story 015: the right edge is the rate's Nyquist limit; nothing above it reaches the readings.
+            if let nyquist = model.input?.nyquist {
+                ctx.stroke(
+                    Path {
+                        $0.move(to: CGPoint(x: size.width - 1, y: 0))
+                        $0.addLine(to: CGPoint(x: size.width - 1, y: size.height))
+                    }, with: .color(red.opacity(0.8)), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                ctx.draw(
+                    Text("Nyquist \(kiloHertz(nyquist))k").font(.caption2).foregroundStyle(red.opacity(0.9)),
+                    at: CGPoint(x: size.width - 4, y: 8), anchor: .trailing)
+            }
         }
     }
 }
@@ -247,6 +258,14 @@ struct SpectrogramView: View {
                 ForEach([2000, 4000, 6000], id: \.self) { f in
                     Text("\(f / 1000)k").font(.caption2).foregroundStyle(.white.opacity(0.7))
                         .position(x: 12, y: geo.size.height * (1 - CGFloat(f) / 8000))
+                }
+                // Story 015: a call-mode route's Nyquist limit, under 8 kHz; it is black above the line.
+                if let nyquist = model.input?.nyquist, nyquist < 8000 {
+                    let y = geo.size.height * (1 - CGFloat(nyquist) / 8000)
+                    Rectangle().fill(red.opacity(0.8)).frame(width: geo.size.width, height: 1)
+                        .position(x: geo.size.width / 2, y: y)
+                    Text("Nyquist \(kiloHertz(nyquist))k").font(.caption2).foregroundStyle(red)
+                        .position(x: geo.size.width - 40, y: max(8, y - 8))
                 }
             }
         }

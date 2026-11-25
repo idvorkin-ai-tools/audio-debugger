@@ -75,3 +75,49 @@ readings (the replay's span, 600 at 30 Hz), digital silence ignored; floor = 10t
 separation = speech − floor, banded GOOD ≥ 30 dB, OK ≥ 15, POOR ≥ 6, under 6 "no speech heard" (a rule of thumb,
 explained in docs/noise.html). The floor's window was 5 s until the readout (a running minimum before that latched
 onto start-up buffers at -110 dB). What has been verified for the noise readout is in the Status line.
+The spectrogram's axis is 0–8 kHz whatever the rate; what a slower input cannot carry stays black (story 015).
+
+## 015 — See the input's rate and why the top is empty
+
+**Summary**: Under the mic bar, one line names the input the audio really comes from, the rate it opened at, and
+whether it is a Bluetooth headset in call mode, with the highest frequency that rate can carry (half the rate, the
+Nyquist limit). The spectrum marks that limit at its right edge, and the spectrogram, always 0–8 kHz, stays black
+above it, with a line at the limit.
+**Status**: Done (013efc2; host tests for the line's text, kHz and the padded spectrogram column at 8, 16 and
+48 kHz; selftest: "Input MacBook Pro Microphone · 48 kHz · up to 24 kHz" logged and on screen with "Nyquist 24k";
+`just ios-build`). Call mode, 8 and 16 kHz routes and the route-change refresh: phone, not yet verified.
+**Issues**: idvorkin/audio-debugger#10
+**Why**: The rate was only in the log. A headset in call mode opens at 16 kHz (nothing above 8 kHz) or 8 kHz
+(nothing above 4 kHz), and on screen that looked like a dull mic rather than a capped one.
+
+**Use Case**: As Igor, I want to see the rate my mic opened at and whether my headset is in call mode, so that a
+spectrum that stops at 4 or 8 kHz reads as the route's limit, not the mic's sound.
+
+**Acceptance Criteria**
+
+- Scenario: A full-rate mic
+  - Given the built-in or a USB mic opened at 48 kHz
+  - When I look under the mic bar
+  - Then it reads "Input <its name> · 48 kHz · up to 24 kHz", and the spectrum's right edge is marked "Nyquist 24k"
+- Scenario: A headset in call mode
+  - Given AirPods' mic opened in call mode at 16 kHz
+  - When I look under the mic bar
+  - Then it reads "Input AirPods · 16 kHz call mode (HFP) · up to 8 kHz" in amber, and the spectrum ends at 8 kHz
+- Scenario: A narrowband route leaves the top of the spectrogram black
+  - Given a route opened at 8 kHz
+  - When I look at the spectrogram
+  - Then it is black above 4 kHz, with a line marked "Nyquist 4k", and its 2k, 4k and 6k marks stay where they are
+- Scenario: The route changes under the open mic (iPhone and iPad)
+  - Given a mic is open
+  - When the audio route changes (a headset connects, a car takes the call link)
+  - Then the line names the route's input as it now stands, and a new rate shows once the mic reopens at it
+- Scenario: No mic open
+  - Given the mic failed to open, or none is open
+  - When I look under the mic bar
+  - Then the line reads "Input —", never the last mic's rate
+
+**Notes**: The rate shown is the one the readings are computed at, so the line, the spectrum's edge and the
+spectrogram's black band always agree. On the Mac, call mode is a Bluetooth mic being open (opening it is what
+switches the headset); on the phone it is the route's input being a hands-free (HFP) Bluetooth port. Before this
+story the spectrogram stretched a narrowband route's 0–4 kHz over its whole height, so the top was never black and
+its marks were wrong. Each change is logged as `input_format` with the line's text.
